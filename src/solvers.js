@@ -17,7 +17,35 @@
 
 window.findNRooksSolution = function(n) {
   var solution = undefined;
+  var board = new Board({'n': n});
 
+  var colPlaced = {};
+  var iterateColumns = function(rowIndex) {
+    for (let i = 0; i < n; i++){
+      if(!colPlaced[i]) {
+        board.togglePiece(rowIndex, i);
+        colPlaced[i] = true;
+        console.log('now colPlaced is ' + JSON.stringify(colPlaced));
+        return;
+      }
+    }
+  };
+
+  for (let j = 0; j < n; j++) {
+    iterateColumns(j);
+  }
+  solution = board.rows();
+
+  // establish already placed columns and rows (object)
+  //use togglepiece to place or unplace pieces
+  // make helper function to iterate over rows
+    // iterate over the columns
+      //check if the index is already defined in the object, check whether the value of that key
+      //if it is not: togglepiece at this index, making it to 1; add index to column and row.
+      //return;
+
+  // for loop on the row index
+    //helperfunction(colIndex)
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
