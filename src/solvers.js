@@ -35,42 +35,127 @@ window.findNRooksSolution = function(n) {
     iterateColumns(j);
   }
   solution = board.rows();
-
-  // establish already placed columns and rows (object)
-  //use togglepiece to place or unplace pieces
-  // make helper function to iterate over rows
-    // iterate over the columns
-      //check if the index is already defined in the object, check whether the value of that key
-      //if it is not: togglepiece at this index, making it to 1; add index to column and row.
-      //return;
-
-  // for loop on the row index
-    //helperfunction(colIndex)
-
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
+
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var solutionCount = 0;
+  var piecesPlaced = 0;
+  var columnPlaced = {};
+  var rowPlaced = 0;
+  var board = new Board({'n': n});
+  var placeOnRow = function(matrix) {
+    for (let i = 0; i < n ; i++) {
 
+      if (!columnPlaced[i]) {
+        piecesPlaced++;
+        if (piecesPlaced === n) {
+          solutionCount++
+        } else {
+          board.togglePiece(rowPlaced, i);
+          columnPlaced[i] = true;
+          placeOnRow(board.rows());
+          board.togglePiece(rowPlaced, i);
+          columnPlaced[i] = false;
+        }
+        piecesPlaced--;
+      }
+    }
+  }
+
+  placeOnRow(board.rows());
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  var solution = new Board({'n': n});
+  var colPlaced = {};
+  var piecesPlaced = 0;
+  var rowPlaced = 0;
+  var firstTimeRun = true;
+  var placeOnRow = function(matrix) {
+    let start = 0;
+    if (firstTimeRun && n > 1) {
+      start = 1;
+      firstTimeRun = false;
+    }
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+    for (let i = start; i < n; i++) {
+      if(!colPlaced[i]) {
+        solution.togglePiece(rowPlaced, i);
+        if (solution.hasMajorDiagonalConflictAt(i - rowPlaced) || solution.hasMinorDiagonalConflictAt(i + rowPlaced)) {
+          solution.togglePiece(rowPlaced, i);
+        } else {
+          piecesPlaced ++;
+          if (piecesPlaced === n) {
+            return;
+          } else {
+            colPlaced[i] = true;
+            rowPlaced ++;
+            placeOnRow(solution.rows());
+            if (piecesPlaced === n) {
+              return;
+            }
+            rowPlaced --;
+            colPlaced[i] = false;
+            solution.togglePiece(rowPlaced, i);
+          }
+          piecesPlaced --;
+        }
+      }
+    }
+  }
+
+  placeOnRow(solution.rows());
+  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution.rows()));
+  return solution.rows();
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+
+  var solutionCount = 0;
+  var solution = new Board({'n': n});
+  var colPlaced = {};
+  var piecesPlaced = 0;
+  var rowPlaced = 0;
+  var firstTimeRun = true;
+  if(n === 0) {
+    return 1;
+  }
+  var placeOnRow = function(matrix) {
+    for (let i = 0; i < n; i++) {
+      if(!colPlaced[i]) {
+        solution.togglePiece(rowPlaced, i);
+        if (solution.hasMajorDiagonalConflictAt(i - rowPlaced) || solution.hasMinorDiagonalConflictAt(i + rowPlaced)) {
+          solution.togglePiece(rowPlaced, i);
+        } else {
+          piecesPlaced ++;
+          if (piecesPlaced === n) {
+            solutionCount++;
+            solution.togglePiece(rowPlaced, i);
+          } else {
+            colPlaced[i] = true;
+            rowPlaced ++;
+            placeOnRow(solution.rows());
+            rowPlaced --;
+            colPlaced[i] = false;
+            solution.togglePiece(rowPlaced, i);
+          }
+          piecesPlaced --;
+        }
+      }
+    }
+  }
+
+  placeOnRow(solution.rows());
 
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
+
   return solutionCount;
 };
